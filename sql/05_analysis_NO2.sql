@@ -1,5 +1,5 @@
 CREATE OR REPLACE TABLE `revou-sql-class-492012.barcelona.district_analysis` AS
-
+  
 WITH NO2_by_district_name AS(
   SELECT
   air_stations_Nov2017.`District Name`,
