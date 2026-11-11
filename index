@@ -1,0 +1,767 @@
+<title>Barcelona Air Quality Report</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,400&family=DM+Sans:wght@300;400;500&display=swap">
+
+<style>
+  /* Layout: single editorial column, sticky nav, white ground with Mediterranean blue accent */
+  :root {
+    --bg: #FFFFFF;
+    --surface: #F4F7FB;
+    --border: #DDE5F0;
+    --ink: #192233;
+    --muted: #5A6A82;
+    --faint: #8A9BB5;
+    --accent: #1E5FAD;
+    --accent-light: #EAF1FB;
+    --accent-mid: #4A89D4;
+    --warn: #B45309;
+    --warn-bg: #FEF3C7;
+    --positive: #0F6E4A;
+    --ff-display: 'Fraunces', Georgia, serif;
+    --ff-body: 'DM Sans', system-ui, sans-serif;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0E1520;
+      --surface: #161F2E;
+      --border: #263248;
+      --ink: #E8EEF8;
+      --muted: #8A9BB5;
+      --faint: #4A5A72;
+      --accent: #4A89D4;
+      --accent-light: #1A2D47;
+      --accent-mid: #6BA3E0;
+      --warn: #F59E0B;
+      --warn-bg: #2A1F06;
+      --positive: #34D399;
+      color-scheme: dark;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #0E1520;
+    --surface: #161F2E;
+    --border: #263248;
+    --ink: #E8EEF8;
+    --muted: #8A9BB5;
+    --faint: #4A5A72;
+    --accent: #4A89D4;
+    --accent-light: #1A2D47;
+    --accent-mid: #6BA3E0;
+    --warn: #F59E0B;
+    --warn-bg: #2A1F06;
+    --positive: #34D399;
+    color-scheme: dark;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--ff-body);
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 0;
+    padding-inline: 20px;
+    padding-block: 0;
+  }
+
+  .page-wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    padding-block: 60px 100px;
+  }
+
+  /* NAV */
+  .toc {
+    position: sticky;
+    top: env(safe-area-inset-top, 0px);
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 0;
+    margin-bottom: 60px;
+    z-index: 10;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-inline: -20px;
+    padding-inline: 20px;
+  }
+
+  .toc a {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+
+  .toc a:hover, .toc a:focus {
+    color: var(--accent);
+    border-color: var(--border);
+    outline: none;
+  }
+
+  /* HEADER */
+  .report-header {
+    margin-bottom: 72px;
+  }
+
+  .report-tag {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .report-title {
+    font-family: var(--ff-display);
+    font-size: clamp(2.4rem, 6vw, 3.6rem);
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--ink);
+    text-wrap: balance;
+    margin: 0 0 24px;
+    letter-spacing: -0.02em;
+  }
+
+  .report-subtitle {
+    font-size: 1.1rem;
+    font-weight: 300;
+    color: var(--muted);
+    line-height: 1.65;
+    max-width: 600px;
+    margin: 0 0 36px;
+  }
+
+  .report-meta {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+
+  .meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .meta-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+
+  .meta-value {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--muted);
+  }
+
+  .meta-value a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .meta-value a:hover { text-decoration: underline; }
+
+  /* SECTIONS */
+  .section {
+    margin-bottom: 72px;
+    scroll-margin-top: 60px;
+  }
+
+  .section-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--faint);
+    margin-bottom: 12px;
+  }
+
+  .section-heading {
+    font-family: var(--ff-display);
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--ink);
+    text-wrap: balance;
+    margin: 0 0 20px;
+    letter-spacing: -0.01em;
+  }
+
+  .section-body {
+    font-size: 0.97rem;
+    line-height: 1.75;
+    color: var(--muted);
+    max-width: 640px;
+  }
+
+  .section-body p { margin: 0 0 16px; }
+  .section-body p:last-child { margin-bottom: 0; }
+
+  /* DATASET PILLS */
+  .dataset-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    margin-top: 24px;
+  }
+
+  .dataset-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 18px;
+  }
+
+  .dataset-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+
+  .dataset-desc {
+    font-size: 11px;
+    color: var(--faint);
+    line-height: 1.4;
+  }
+
+  /* METHODOLOGY STEPS */
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-top: 28px;
+    border-left: 2px solid var(--border);
+    padding-left: 28px;
+  }
+
+  .step {
+    position: relative;
+    padding-bottom: 32px;
+  }
+
+  .step:last-child { padding-bottom: 0; }
+
+  .step::before {
+    content: '';
+    position: absolute;
+    left: -35px;
+    top: 5px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid var(--bg);
+    box-shadow: 0 0 0 2px var(--accent);
+  }
+
+  .step-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+
+  .step-body {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* FINDINGS — the bold moment */
+  .findings-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 28px 0;
+  }
+
+  .finding-cell {
+    background: var(--bg);
+    padding: 28px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .finding-pollutant {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+
+  .finding-r {
+    font-family: var(--ff-display);
+    font-size: clamp(2.4rem, 5vw, 3.2rem);
+    font-weight: 600;
+    line-height: 1;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.03em;
+  }
+
+  .finding-r.negative { color: var(--accent); }
+  .finding-r.positive { color: var(--accent-mid); }
+
+  .finding-pval {
+    font-size: 12px;
+    color: var(--faint);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .finding-sig {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 20px;
+    background: var(--warn-bg);
+    color: var(--warn);
+    letter-spacing: 0.04em;
+    margin-top: 4px;
+  }
+
+  .verdict-box {
+    background: var(--surface);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    padding: 20px 24px;
+    margin-top: 4px;
+  }
+
+  .verdict-box p {
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  /* LIMITATIONS */
+  .limitations-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 24px;
+  }
+
+  .limitation {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    background: var(--surface);
+    border-radius: 8px;
+    padding: 18px 20px;
+  }
+
+  .limitation-icon {
+    font-size: 18px;
+    line-height: 1;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .limitation-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+
+  .limitation-body {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+
+  /* CODE BLOCKS */
+  .code-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    border: none;
+    background: none;
+    padding: 10px 0;
+    color: var(--accent);
+    font-size: 13px;
+    font-weight: 500;
+    font-family: var(--ff-body);
+    margin-top: 16px;
+  }
+
+  .code-toggle:hover { opacity: 0.75; }
+  .code-toggle:focus-visible { outline: 2px solid var(--accent); border-radius: 4px; }
+
+  .code-arrow {
+    display: inline-block;
+    transition: transform 0.2s;
+    font-style: normal;
+  }
+
+  .code-wrap {
+    overflow-x: auto;
+    border-radius: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    margin-top: 8px;
+  }
+
+  pre {
+    margin: 0;
+    padding: 20px 24px;
+    font-size: 12px;
+    line-height: 1.65;
+    color: var(--muted);
+    font-family: 'Courier New', Courier, monospace;
+    white-space: pre;
+    min-width: 0;
+  }
+
+  /* LINKS ROW */
+  .links-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 28px;
+    padding-top: 28px;
+    border-top: 1px solid var(--border);
+  }
+
+  .link-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: border-color 0.15s, background 0.15s;
+  }
+
+  .link-pill:hover {
+    border-color: var(--accent);
+    background: var(--accent-light);
+    color: var(--accent);
+  }
+
+  /* SCATTER SVG */
+  .chart-wrap {
+    overflow-x: auto;
+    margin-top: 24px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    padding: 24px;
+  }
+
+  .chart-title {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+    margin-bottom: 12px;
+    letter-spacing: 0.04em;
+  }
+
+  /* FOOTER */
+  .report-footer {
+    padding-top: 40px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .footer-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .footer-note {
+    font-size: 12px;
+    color: var(--faint);
+  }
+
+  @media (max-width: 540px) {
+    .findings-grid { grid-template-columns: 1fr; }
+    .toc a { font-size: 11px; padding: 3px 8px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .code-arrow { transition: none; }
+  }
+</style>
+
+<!-- sticky nav -->
+<nav class="toc" aria-label="Page sections">
+  <a href="#overview">Overview</a>
+  <a href="#dataset">Dataset</a>
+  <a href="#methodology">Methodology</a>
+  <a href="#findings">Findings</a>
+  <a href="#limitations">Limitations</a>
+  <a href="#conclusion">Conclusion</a>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- HEADER -->
+  <header class="report-header">
+    <p class="report-tag">Data Analysis · Barcelona</p>
+    <h1 class="report-title">Does air quality affect life expectancy in Barcelona?</h1>
+    <p class="report-subtitle">A district-level analysis using open data from the Barcelona city government — cleaning raw datasets in BigQuery SQL, then testing correlations in Python.</p>
+    <div class="report-meta">
+      <div class="meta-item">
+        <span class="meta-label">Author</span>
+        <span class="meta-value">Putra Adyasa</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Tools</span>
+        <span class="meta-value">BigQuery SQL · Python · scipy</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Data source</span>
+        <span class="meta-value"><a href="https://opendata-ajuntament.barcelona.cat/en" target="_blank">Open Data BCN</a></span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Code</span>
+        <span class="meta-value">
+          <a href="https://github.com/putraadyasa/barcelona-air-quality" target="_blank">GitHub</a>
+          &nbsp;·&nbsp;
+          <a href="https://www.kaggle.com/code/putraadyasa/v1-barcelona-air-quality-analysis" target="_blank">Kaggle</a>
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- OVERVIEW -->
+  <section class="section" id="overview">
+    <p class="section-label">Overview</p>
+    <h2 class="section-heading">The question</h2>
+    <div class="section-body">
+      <p>Air pollution is one of the leading environmental health risks in European cities. Barcelona, like many dense urban centres, has districts with measurable differences in pollutant levels. This project asks: do the districts with worse air quality also have lower life expectancy?</p>
+      <p>Using three pollutants — NO₂, O₃, and PM10 — measured across 10 Barcelona districts in November 2017, and life expectancy data from 2006–2014, I ran a Pearson correlation test to look for a statistical relationship.</p>
+    </div>
+  </section>
+
+  <!-- DATASET -->
+  <section class="section" id="dataset">
+    <p class="section-label">Dataset</p>
+    <h2 class="section-heading">Three datasets, cleaned and joined</h2>
+    <div class="section-body">
+      <p>All data comes from the <a href="https://opendata-ajuntament.barcelona.cat/en" target="_blank">Open Data BCN</a> platform, a public data portal run by the Barcelona city government.</p>
+    </div>
+    <div class="dataset-grid">
+      <div class="dataset-card">
+        <div class="dataset-name">Air Quality</div>
+        <div class="dataset-desc">NO₂, O₃, PM10 readings by station · November 2017</div>
+      </div>
+      <div class="dataset-card">
+        <div class="dataset-name">Life Expectancy</div>
+        <div class="dataset-desc">Average by district · 2006–2014 rolling windows</div>
+      </div>
+      <div class="dataset-card">
+        <div class="dataset-name">Population</div>
+        <div class="dataset-desc">District population totals · 2013–2017</div>
+      </div>
+    </div>
+
+    <button class="code-toggle" onclick="toggleCode('code-cleaning')" aria-expanded="false" aria-controls="code-cleaning">
+      <i class="code-arrow" id="arrow-cleaning">▶</i> View SQL — data cleaning (NO₂ example)
+    </button>
+    <div class="code-wrap" id="code-cleaning" hidden>
+      <pre>-- 04_cleaning_air_quality.sql
+-- Remove 'NA' strings, deduplicate stations using median,
+-- and normalise district names for joining.
+
+WITH raw AS (
+  SELECT
+    station_name,
+    district,
+    NULLIF(value, 'NA') AS value_clean,
+    pollutant
+  FROM `barcelona.air_quality_nov2017`
+  WHERE pollutant = 'NO2'
+),
+median_per_district AS (
+  SELECT
+    district,
+    PERCENTILE_CONT(CAST(value_clean AS FLOAT64), 0.5)
+      OVER (PARTITION BY district) AS median_value
+  FROM raw
+  WHERE value_clean IS NOT NULL
+)
+SELECT
+  TRIM(REPLACE(REPLACE(district, 'à', 'a'), 'è', 'e')) AS district_clean,
+  ROUND(AVG(median_value), 2) AS avg_NO2
+FROM median_per_district
+GROUP BY district_clean
+ORDER BY avg_NO2 DESC;</pre>
+    </div>
+  </section>
+
+  <!-- METHODOLOGY -->
+  <section class="section" id="methodology">
+    <p class="section-label">Methodology</p>
+    <h2 class="section-heading">From raw data to correlation test</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-title">Clean each dataset in BigQuery</div>
+        <div class="step-body">Used NULLIF() to handle 'NA' strings, PERCENTILE_CONT for deduplicating measurement stations, and TRIM/REPLACE for normalising Catalan district names so tables could be joined cleanly.</div>
+      </div>
+      <div class="step">
+        <div class="step-title">Aggregate pollutants per district</div>
+        <div class="step-body">Computed average NO₂, O₃, and PM10 concentration per district. Joined with life expectancy data on district name. This produced a table of 10 rows — one per Barcelona district.</div>
+      </div>
+      <div class="step">
+        <div class="step-title">Export and test in Python</div>
+        <div class="step-body">Ran scipy.stats.pearsonr() on each pollutant against average life expectancy. Generated scatter plots to visualise the relationship. Assessed statistical significance using p-value threshold of 0.05.</div>
+      </div>
+    </div>
+
+    <button class="code-toggle" onclick="toggleCode('code-python')" aria-expanded="false" aria-controls="code-python">
+      <i class="code-arrow" id="arrow-python">▶</i> View Python — Pearson correlation
+    </button>
+    <div class="code-wrap" id="code-python" hidden>
+      <pre>from scipy import stats
+import pandas as pd
+
+df = pd.read_csv('/kaggle/input/datasets/putraadyasa/barcelona-analysis/barcelona_NO2.csv')
+
+# Pearson correlation: NO2 vs life expectancy
+r, p = stats.pearsonr(df['avg_NO2'], df['life_expectancy'])
+
+print(f'NO2  →  r = {r:.3f},  p-value = {p:.3f}')
+# Output: NO2  →  r = -0.232,  p-value = 0.617</pre>
+    </div>
+  </section>
+
+  <!-- FINDINGS -->
+  <section class="section" id="findings">
+    <p class="section-label">Findings</p>
+    <h2 class="section-heading">No statistically significant correlation found</h2>
+    <div class="section-body">
+      <p>All three pollutants showed weak correlations and p-values well above the 0.05 significance threshold. The result is inconclusive — not a null result, but a data limitation result.</p>
+    </div>
+
+    <div class="findings-grid">
+      <div class="finding-cell">
+        <span class="finding-pollutant">NO₂ · ~28 µg/m³ avg</span>
+        <span class="finding-r negative">−0.232</span>
+        <span class="finding-pval">p = 0.617</span>
+        <span class="finding-sig">Not significant</span>
+      </div>
+      <div class="finding-cell">
+        <span class="finding-pollutant">O₃ · ~35 µg/m³ avg</span>
+        <span class="finding-r positive">+0.223</span>
+        <span class="finding-pval">p = 0.719</span>
+        <span class="finding-sig">Not significant</span>
+      </div>
+      <div class="finding-cell">
+        <span class="finding-pollutant">PM10 · ~22 µg/m³ avg</span>
+        <span class="finding-r negative">−0.171</span>
+        <span class="finding-pval">p = 0.783</span>
+        <span class="finding-sig">Not significant</span>
+      </div>
+    </div>
+
+    <div class="verdict-box">
+      <p>A p-value above 0.05 means we cannot rule out that the correlation happened by chance. With only 10 data points and a time mismatch between datasets, these results cannot confirm or deny a real relationship between air quality and life expectancy in Barcelona.</p>
+    </div>
+  </section>
+
+  <!-- LIMITATIONS -->
+  <section class="section" id="limitations">
+    <p class="section-label">Limitations</p>
+    <h2 class="section-heading">Why the result may not tell the full story</h2>
+    <div class="limitations-list">
+      <div class="limitation">
+        <span class="limitation-icon">⏱</span>
+        <div>
+          <div class="limitation-title">Time mismatch</div>
+          <div class="limitation-body">Air quality data is a single snapshot from November 2017. Life expectancy is an average from rolling 5-year windows between 2006 and 2014. These time periods do not overlap.</div>
+        </div>
+      </div>
+      <div class="limitation">
+        <span class="limitation-icon">📏</span>
+        <div>
+          <div class="limitation-title">Small sample size</div>
+          <div class="limitation-body">The analysis uses 10 data points — one per district. Statistical tests need larger samples to produce reliable results. 10 points is insufficient for Pearson correlation to be meaningful.</div>
+        </div>
+      </div>
+      <div class="limitation">
+        <span class="limitation-icon">🔍</span>
+        <div>
+          <div class="limitation-title">Missing confounders</div>
+          <div class="limitation-body">Life expectancy is strongly influenced by income level, healthcare access, lifestyle, and housing quality — none of which are in this dataset. Air quality alone explains only a fraction of the variation.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONCLUSION -->
+  <section class="section" id="conclusion">
+    <p class="section-label">Conclusion</p>
+    <h2 class="section-heading">What I learned</h2>
+    <div class="section-body">
+      <p>This project demonstrates a complete analytics workflow: raw open data → SQL cleaning → Python statistical testing → honest reporting of results. The null result is a legitimate outcome — real analysis often produces inconclusive findings, and knowing why the data falls short is part of the work.</p>
+      <p>A stronger analysis would require multi-year air quality data matched to the same time period as the health data, neighborhood-level granularity, and additional socioeconomic variables. That is the next version of this project.</p>
+    </div>
+
+    <div class="links-row">
+      <a class="link-pill" href="https://github.com/putraadyasa/barcelona-air-quality" target="_blank">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        GitHub repo
+      </a>
+      <a class="link-pill" href="https://www.kaggle.com/code/putraadyasa/v1-barcelona-air-quality-analysis" target="_blank">
+        <svg width="16" height="16" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M16 0C7.163 0 0 7.163 0 16s7.163 16 16 16 16-7.163 16-16S24.837 0 16 0zm5.992 23.016l-5.04-5.816-1.584 1.68v4.136H12V8.984h3.368v6.216l6.24-6.216h4.2l-6.36 6.296 6.552 7.736h-4.008z"/></svg>
+        Kaggle notebook
+      </a>
+    </div>
+  </section>
+
+  <footer class="report-footer">
+    <span class="footer-name">Putra Adyasa · <a href="https://linkedin.com/in/putraadyasa" target="_blank" style="color:var(--accent);text-decoration:none;">linkedin.com/in/putraadyasa</a></span>
+    <span class="footer-note">Open Data BCN · November 2017 snapshot</span>
+  </footer>
+
+</div>
+
+<script>
+  function toggleCode(id) {
+    const block = document.getElementById(id);
+    const arrowId = 'arrow-' + id.replace('code-', '');
+    const arrow = document.getElementById(arrowId);
+    const btn = block.previousElementSibling;
+    const isHidden = block.hidden;
+    block.hidden = !isHidden;
+    if (arrow) arrow.style.transform = isHidden ? 'rotate(90deg)' : '';
+    if (btn) btn.setAttribute('aria-expanded', String(isHidden));
+  }
+</script>
